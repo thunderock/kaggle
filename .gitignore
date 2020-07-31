@@ -1,0 +1,17 @@
+target/
+*.log
+*~
+*.class
+*.pyc
+#.*#
+*idea
+/target
+*.iml
+*.settings
+.ipynb_checkpoints/
+*/.DS_Store
+.idea/*
+runs/*
+cache_dir/*
+bert*
+.DS_Store
