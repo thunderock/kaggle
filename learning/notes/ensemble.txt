@@ -1,0 +1,10 @@
+Types:
+  1. heterogeneous ensembles
+    different component models built independently and then results are merged in a way or the other
+  2. homogeneous ensembles
+    examples: Adaboost, XGboost, random forests
+    same algorithms differnt variants using same algorithm
+    sometimes built iteratively
+  3. metamodelling
+    different models working together
+    could be different model for different cases
