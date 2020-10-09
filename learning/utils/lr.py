@@ -85,7 +85,7 @@ final_valid_df.to_csv("learning/utils/pred/pred_lr_svd.csv", index=False)
 
 dfs = []
 for i in range(5):
-    v = TfidfVectorizer()
+    v = TfidfVectorizer(max_features=1000)
     temp_df = run_training(i, v, "lr_pred")
     dfs.append(temp_df)
 
