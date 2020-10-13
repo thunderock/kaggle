@@ -1,0 +1,6 @@
+https://www.kaggle.com/rafjaa/resampling-strategies-for-imbalanced-datasets
+# resampling in imbalanced datasets
+
+# problems with no sampling
+
+* metric trap
