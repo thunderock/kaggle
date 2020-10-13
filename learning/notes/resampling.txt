@@ -1,6 +1,20 @@
 https://www.kaggle.com/rafjaa/resampling-strategies-for-imbalanced-datasets
 # resampling in imbalanced datasets
 
-# problems with no sampling
 
-* metric trap
+Under sampling
+* random
+* tomek links:
+  Tomek links are pairs of very close instances but of opposite classes. Removing instances of the majority class of each pair increases
+  the space between the two classes thus facilititating the classification process.
+
+* Cluster Centroids
+  this technique performs under sampling by generating centroids based on clustering methods. The data will be previously grouped by
+  similarity, in order to preserve information.
+
+Over sampling
+* random 
+* SMOTE
+  Synthetic Minority Oversampling Technique consists of synthesizing elements fir the minority class, based on those that already exist.
+  It works on randomly picking a point from the minority class and computing the K nearest neighbours for this point. The synthetic
+  points are added between the chosen point and its neighbours.
