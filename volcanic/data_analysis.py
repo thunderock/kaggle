@@ -13,7 +13,6 @@ from tqdm import tqdm
 import joblib
 from joblib import Parallel, delayed
 import multiprocessing
-num_cores = multiprocessing.cpu_count()-1
 
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
@@ -39,20 +38,30 @@ def features_generator(path_to_file):
                                           default_fc_parameters=EfficientFCParameters(),
                                           n_jobs = 0,
                                           disable_progressbar = True,
-                                          chunksize = None,
+                                          chunksize = None
                                          )
     return extracted_features
 
 
-train_path_to_signals = 'data/predict-volcanic-eruptions-ingv-oe/train/'
+num_cores = multiprocessing.cpu_count() - 1
+num_cores = 30
+train_path_to_signals = 'train/'
 train_files_list = [os.path.join(train_path_to_signals, file) for file in os.listdir(train_path_to_signals)]
-rows = Parallel(n_jobs=6)(delayed(features_generator)(ex) for ex in tqdm(train_files_list[:]))  
+rows = Parallel(n_jobs=num_cores)(delayed(features_generator)(ex) for ex in tqdm(train_files_list[:]))
+# rows = [features_generator(ex) for ex in tqdm(train_files_list[:])]
 train_set = pd.concat(rows, axis=0)
 
-test_path_to_signals = 'data/predict-volcanic-eruptions-ingv-oe/test/'
+del train_files_list
+
+test_path_to_signals = 'test/'
 test_files_list = [os.path.join(test_path_to_signals, file) for file in os.listdir(test_path_to_signals)]
-rows = Parallel(n_jobs=6)(delayed(features_generator)(ex) for ex in tqdm(test_files_list[:]))  
+rows = Parallel(n_jobs=num_cores)(delayed(features_generator)(ex) for ex in tqdm(test_files_list[:]))
+# rows = [features_generator(ex) for ex in tqdm(test_files_list[:])]
 test_set = pd.concat(rows, axis=0)
+
+
+del test_files_list
+
 
 print(train_set.head(10))
 
@@ -65,7 +74,3 @@ train_set.to_csv('train_features.csv')
 
 
 test_set.to_csv('test_features.csv')
-
-
-
-
