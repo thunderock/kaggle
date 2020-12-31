@@ -35,4 +35,16 @@ optim = torch.optim.SGD(model.parameters(), lr=.01)
 
 EPOCHS = 10000
 for i in range(EPOCHS):
-    
+    optim.zero_grad()
+    results = model(inputs)
+    loss = loss_fn(results, outputs)
+    loss.backward()
+    optim.step()
+    gradients = 0.0
+    for parameter in model.parameters():
+        gradients += parameter.grad.sum()
+    if abs(gradients) <= .0001:
+        print(gradients)
+        print("grardients vanished at iteration {0}".format(i))
+        break
+print(model(inputs), outputs)
