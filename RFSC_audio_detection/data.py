@@ -2,9 +2,9 @@ import os, glob, random
 import numpy as np, pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
-base_path =
-train = pd.read_csv("../input/rfcx-species-audio-detection/train_tp.csv").sort_values("recording_id")
-ss = pd.read_csv("../input/rfcx-species-audio-detection/sample_submission.csv")
+base_path = 'data'
+train = pd.read_csv("{base_path}/train_tp.csv").sort_values("recording_id")
+ss = pd.read_csv("{base_path}/sample_submission.csv")
 
 FOLDS = 5
 SEED = 42
