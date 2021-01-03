@@ -1,10 +1,11 @@
-import os, glob, random
+import os
+import glob, random
 import numpy as np, pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
-base_path = 'data'
-train = pd.read_csv("{base_path}/train_tp.csv").sort_values("recording_id")
-ss = pd.read_csv("{base_path}/sample_submission.csv")
+base_path = '/home/ashutosh/code/kaggle/RFSC_audio_detection/'
+train = pd.read_csv(os.path.join(base_path, "data/train_tp.csv")).sort_values("recording_id")
+ss = pd.read_csv(os.path.join(base_path, "data/sample_submission.csv"))
 
 FOLDS = 5
 SEED = 42
@@ -22,4 +23,4 @@ for fold, (t_idx, v_idx) in enumerate(kfold.split(X, y)):
 
 train = train.merge(train_gby[['recording_id', 'kfold']], on="recording_id", how="left")
 print(train.kfold.value_counts())
-train.to_csv("train_folds.csv", index=False)
+train.to_csv(os.path.join(base_path, "train_folds.csv"), index=False)
