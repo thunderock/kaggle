@@ -4,7 +4,7 @@ import numpy as np
 import torch, torch.nn as nn
 import torch.nn.functional as F
 
-from Utils import AverageMeter, MetricMeter
+from utils import AverageMeter, MetricMeter
 
 def train_epoch(args, model, loader, criterion, optimizer, scheduler, epoch):
     losses = AverageMeter()

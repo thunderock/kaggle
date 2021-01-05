@@ -9,20 +9,14 @@ import torch.nn.functional as F
 
 from transformers import get_linear_schedule_with_warmup
 from tqdm import tqdm
-
-try:
-    import wandb
-except:
-    wandb = False
-
 import datasets
 import models
 import losses
 import functions
-import augmentation
+import augmentations
 
 class args:
-    DEBUG = False
+    DEBUG = True
     exp_name = "resnest50d_5fold_base"
     network = "AudioClassifier"
     pretrain_weights = None
@@ -51,7 +45,7 @@ class args:
     device = ('cuda' if torch.cuda.is_available() else 'cpu')
     train_csv = "train_folds.csv"
     test_csv = "test_df.csv"
-    sub_csv = "../input/rfcx-species-audio-detection/sample_submission.csv"
+    sub_csv = "data/sample_submission.csv"
     output_dir = "weights"
 
 def main(fold):
@@ -70,34 +64,37 @@ def main(fold):
     os.makedirs(args.save_path, exist_ok=True)
 
     train_df = pd.read_csv(args.train_csv)
-    #test_df = pd.read_csv(args.test_csv)
+
     sub_df = pd.read_csv(args.sub_csv)
     if args.DEBUG:
-        train_df = train_df.sample(1000)
+        train_df = train_df.sample(100)
+        sub_df = sub_df.sample(10)
+        args.batch_size = 4
+        args.epochs = 10
     train_fold = train_df[train_df.kfold != fold]
     valid_fold = train_df[train_df.kfold == fold]
 
-    train_dataset = Datasets.AudioDataset(
+    train_dataset = datasets.AudioDataset(
         df=train_fold,
         period=args.period,
-        transforms=Augmentation.augmenter,
+        transforms=augmentations.augmenter,
         train=True,
-        data_path="../input/rfcx-species-audio-detection/train"
+        data_path="data/train"
     )
-    valid_dataset = Datasets.AudioDataset(
+    valid_dataset = datasets.AudioDataset(
         df=valid_fold,
         period=args.period,
         transforms=None,
         train=True,
-        data_path="../input/rfcx-species-audio-detection/train"
+        data_path="data/train"
     )
 
-    test_dataset = Datasets.TestDataset(
+    test_dataset = datasets.TestDataset(
         df=sub_df,
         period=args.period,
         transforms=None,
         train=False,
-        data_path="../input/rfcx-species-audio-detection/test"
+        data_path="data/test"
     )
 
     train_loader = torch.utils.data.DataLoader(
@@ -123,7 +120,7 @@ def main(fold):
         num_workers=args.num_workers
     )
 
-    model = Models.__dict__[args.network](**args.model_param)
+    model = models.__dict__[args.network](**args.model_param)
     model = model.to(args.device)
 
     if args.pretrain_weights:
@@ -131,17 +128,16 @@ def main(fold):
         model.load_state_dict(torch.load(args.pretrain_weights, map_location=args.device)["model"], strict=False)
         model = model.to(args.device)
 
-    criterion = Losses.__dict__[args.losses]()
+    criterion = losses.__dict__[args.losses]()
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
     num_train_steps = int(len(train_loader) * args.epochs)
     num_warmup_steps = int(0.1 * args.epochs * len(train_loader))
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_train_steps)
 
-
     best_lwlrap = -np.inf
     for epoch in range(args.start_epoch, args.epochs):
-        train_avg, train_loss = Functions.train_epoch(args, model, train_loader, criterion, optimizer, scheduler, epoch)
-        valid_avg, valid_loss = Functions.valid_epoch(args, model, valid_loader, criterion, epoch)
+        train_avg, train_loss = functions.train_epoch(args, model, train_loader, criterion, optimizer, scheduler, epoch)
+        valid_avg, valid_loss = functions.valid_epoch(args, model, valid_loader, criterion, epoch)
 
         if args.epoch_scheduler:
             scheduler.step()
@@ -167,7 +163,7 @@ def main(fold):
     model = model.to(args.device)
 
     target_cols = sub_df.columns[1:].values.tolist()
-    test_pred, ids = Functions.test_epoch(args, model, test_loader)
+    test_pred, ids = functions.test_epoch(args, model, test_loader)
     print(np.array(test_pred).shape)
 
     test_pred_df = pd.DataFrame({
@@ -177,12 +173,8 @@ def main(fold):
     test_pred_df.to_csv(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"), index=False)
     print(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"))
 
-    #oof_pred, ids = Functions.test_epoch(args, model, valid_loader)
-    #oof_pred_df = pd.DataFrame({
-    #    "recording_id" : ids
-    #})
-    #oof_pred_df[target_cols] = oof_pred
-    #oof_pred_df.to_csv(os.path.join(args.save_path, f"oof-fold-{args.fold}.csv"), index=False)
+
+
 
 if __name__ == "__main__":
     for fold in range(5):
