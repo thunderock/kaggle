@@ -70,7 +70,7 @@ def main(fold):
         train_df = train_df.sample(100)
         sub_df = sub_df.sample(10)
         args.batch_size = 4
-        args.epochs = 10
+        args.epochs = 5
     train_fold = train_df[train_df.kfold != fold]
     valid_fold = train_df[train_df.kfold == fold]
 
@@ -169,7 +169,8 @@ def main(fold):
     test_pred_df = pd.DataFrame({
         "recording_id" : sub_df.recording_id.values
     })
-    test_pred_df[target_cols] = test_pred
+    # need to fix this line
+    test_pred_df[target_cols] = np.array(test_pred)
     test_pred_df.to_csv(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"), index=False)
     print(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"))
 
