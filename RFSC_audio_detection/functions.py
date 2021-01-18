@@ -59,6 +59,7 @@ def valid_epoch(args, model, loader, criterion, epoch):
     t.close()
     return scores.avg, losses.avg
 
+
 def test_epoch(args, model, loader):
     model.eval()
     pred_list = []
@@ -68,7 +69,7 @@ def test_epoch(args, model, loader):
         for i, sample in enumerate(t):
             input = sample["waveform"].to(args.device)
             bs, seq, w = input.shape
-            input = input.reshape(bs*seq, w)
+            input = input.reshape(bs * seq, w)
             id = sample["id"]
             output = torch.sigmoid(model(input))
             output = output.reshape(bs, seq, -1)

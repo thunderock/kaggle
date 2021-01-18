@@ -170,7 +170,11 @@ def main(fold):
         "recording_id" : sub_df.recording_id.values
     })
     # need to fix this line
-    test_pred_df[target_cols] = np.array(test_pred)
+    test_pred = np.array(test_pred)
+    for col in range(len(target_cols)):
+        assert len(target_cols) == test_pred.shape[1]
+        test_pred_df[target_cols[col]] = test_pred[:, col]
+
     test_pred_df.to_csv(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"), index=False)
     print(os.path.join(args.save_path, f"fold-{args.fold}-submission.csv"))
 
