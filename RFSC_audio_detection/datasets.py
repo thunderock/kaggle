@@ -1,12 +1,7 @@
-import random
-import glob
 import numpy as np
-import pandas as pd
 import soundfile as sf
-
 import torch
 from torch.utils.data import Dataset
-from albumentations.pytorch.functional import img_to_tensor
 
 
 class AudioDataset(Dataset):
@@ -25,7 +20,6 @@ class AudioDataset(Dataset):
         else:
             self.recording_ids = df["recording_id"].values
 
-    
     def __len__(self):
         return len(self.recording_ids)
     
@@ -90,6 +84,7 @@ class AudioDataset(Dataset):
             "id" : recording_id
         }
 
+
 class TestDataset(Dataset):
     def __init__(self, df, period=10, transforms=None, data_path="train", train=True):
         self.period = period
@@ -99,7 +94,6 @@ class TestDataset(Dataset):
         
         self.recording_ids = df["recording_id"].values
 
-    
     def __len__(self):
         return len(self.recording_ids)
     

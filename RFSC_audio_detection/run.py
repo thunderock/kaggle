@@ -48,9 +48,8 @@ class args:
     sub_csv = "data/sample_submission.csv"
     output_dir = "weights"
 
-def main(fold):
 
-    # Setting seed
+def main(fold):
     seed = args.seed
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)

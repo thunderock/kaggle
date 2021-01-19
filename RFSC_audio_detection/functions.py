@@ -1,30 +1,22 @@
 from tqdm import tqdm
+import torch
 
-import numpy as np
-import torch, torch.nn as nn
-import torch.nn.functional as F
 
 from utils import AverageMeter, MetricMeter
+
 
 def train_epoch(args, model, loader, criterion, optimizer, scheduler, epoch):
     losses = AverageMeter()
     scores = MetricMeter()
 
     model.train()
-    #scaler = torch.cuda.amp.GradScaler()
-
     t = tqdm(loader)
     for i, sample in enumerate(t):
         optimizer.zero_grad()
         input = sample['waveform'].to(args.device)
         target = sample['target'].to(args.device)
-        #print(input.shape)
-        #with torch.cuda.amp.autocast(enabled=args.amp):
         output = model(input)
         loss = criterion(output, target)
-        #scaler.scale(loss).backward()
-        #scaler.step(optimizer)
-        #scaler.update()
         loss.backward()
         optimizer.step()
         if scheduler and args.step_scheduler:
@@ -37,6 +29,7 @@ def train_epoch(args, model, loader, criterion, optimizer, scheduler, epoch):
         t.set_description(f"Train E:{epoch} - Loss{losses.avg:0.4f}")
     t.close()
     return scores.avg, losses.avg
+
 
 def valid_epoch(args, model, loader, criterion, epoch):
     losses = AverageMeter()
