@@ -1,7 +1,5 @@
 from tqdm import tqdm
 import torch
-
-
 from utils import AverageMeter, MetricMeter
 
 
