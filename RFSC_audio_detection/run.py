@@ -47,7 +47,7 @@ class Args:
     train_csv = "/home/ashutosh/code/kaggle/RFSC_audio_detection/train_folds.csv"
     test_csv = "test_df.csv"
     sub_csv = "/home/ashutosh/code/kaggle/RFSC_audio_detection/data/sample_submission.csv"
-    output_dir = "weights"
+    output_dir = "/home/ashutosh/code/kaggle/RFSC_audio_detection/weights"
 
 
 def main(fold):
